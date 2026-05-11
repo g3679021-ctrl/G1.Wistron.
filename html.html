@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>緯創資通互動學習網頁</title>
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- 引入 FontAwesome 圖示 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Tailwind 客製化設定 (導入競賽優勝配色) -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdfa',
+              100: '#ccfbf1',
+              200: '#99f6e4',
+              300: '#5eead4',
+              400: '#2dd4bf',
+              500: '#14b8a6', // 青綠色 Teal
+              600: '#0d9488', // 沉穩青綠
+              700: '#0f766e',
+              800: '#115e59',
+              900: '#134e4a',
+            },
+            accent: {
+              light: '#fef3c7',
+              DEFAULT: '#f59e0b', // 琥珀金 Amber
+              dark: '#d97706'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* 翻轉字卡所需的 3D 透視效果 */
+    .perspective-1000 { perspective: 1000px; }
+    .preserve-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    /* 自訂 audio 播放器樣式微調 */
+    audio {
+      width: 100%;
+      height: 48px;
+      outline: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 flex min-h-screen">
+
+  <!-- 頂端列 (Top Bar) -->
+  <header class="fixed top-0 w-full flex items-center justify-between px-4 sm:px-6 py-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md z-50 shadow-sm border-b border-gray-200 dark:border-slate-800 transition-colors">
+    <div class="flex items-center gap-4">
+      <button id="mobileMenuBtn" class="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400 transition rounded-md">
+        <i class="fa-solid fa-bars text-xl"></i>
+      </button>
+      <div class="font-bold text-xl text-brand-600 dark:text-brand-400 cursor-pointer md:hidden" onclick="navigateTo('home')">
+        Wistron<span class="text-slate-900 dark:text-white">Strategy</span>
+      </div>
+    </div>
+
+    <!-- 右側功能鍵 置頂 -->
+    <div class="flex items-center gap-2 sm:gap-4">
+      <button id="langBtn" class="flex items-center justify-center gap-1 p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition text-slate-700 dark:text-slate-300 font-bold text-sm">
+        <i class="fa-solid fa-globe"></i> <span id="langText">EN</span>
+      </button>
+      <button id="themeBtn" class="flex items-center justify-center p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition text-slate-700 dark:text-slate-300">
+        <i id="themeIcon" class="fa-solid fa-moon"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- 左側選單 Sidebar -->
+  <aside id="sidebar" class="w-64 bg-slate-900 text-white fixed h-full z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col shadow-2xl pt-16">
+    <div class="p-6 flex-1 flex flex-col overflow-y-auto">
+      <div class="hidden md:block text-2xl font-bold text-accent mb-10 cursor-pointer" onclick="navigateTo('home')">
+        Wistron<span class="text-white">Strategy</span>
+      </div>
+      
+      <!-- 導覽連結 -->
+      <nav class="flex-1 space-y-2 text-sm lg:text-base">
+        <a href="#" onclick="navigateTo('intro'); return false;" class="block py-3 px-4 rounded-lg hover:bg-slate-800 hover:text-accent transition" data-i18n="nav_intro">動機與介紹</a>
+        <a href="#" onclick="navigateTo('team'); return false;" class="block py-3 px-4 rounded-lg hover:bg-slate-800 hover:text-accent transition" data-i18n="nav_team">團隊介紹</a>
+        <a href="#" onclick="navigateTo('ch1'); return false;" class="block py-3 px-4 rounded-lg hover:bg-slate-800 hover:text-accent transition" data-i18n="nav_ch1">轉型策略</a>
+        <a href="#" onclick="navigateTo('ch2'); return false;" class="block py-3 px-4 rounded-lg hover:bg-slate-800 hover:text-accent transition" data-i18n="nav_ch2">財務與績效</a>
+        <a href="#" onclick="navigateTo('ch3'); return false;" class="block py-3 px-4 rounded-lg hover:bg-slate-800 hover:text-accent transition" data-i18n="nav_ch3">全球佈局</a>
+        <a href="#" onclick="navigateTo('ch4_5'); return false;" class="block py-3 px-4 rounded-lg hover:bg-slate-800 hover:text-accent transition" data-i18n="nav_ch4_5">永續與展望</a>
+        <a href="#" onclick="navigateTo('quiz'); return false;" class="block py-3 px-4 rounded-lg hover:bg-slate-800 hover:text-accent transition" data-i18n="nav_quiz">互動測驗</a>
+        <a href="#" onclick="navigateTo('ai'); return false;" class="block py-3 px-4 rounded-lg hover:bg-slate-800 hover:text-accent transition" data-i18n="nav_ai">AI 運用</a>
+        <a href="#" onclick="navigateTo('references'); return false;" class="block py-3 px-4 rounded-lg bg-brand-900/50 hover:bg-brand-800 text-brand-300 hover:text-brand-100 border border-brand-800 transition mt-4" data-i18n="nav_ref">引用資料</a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- 右側主要內容區 Main Content -->
+  <main class="flex-1 md:ml-64 w-full pt-16 flex flex-col min-h-screen">
+    
+    <div class="flex-1">
+      <!-- Hero Section -->
+      <header id="home" class="page-section relative pt-24 pb-32 flex flex-col items-center justify-center text-center px-4 overflow-hidden border-b border-gray-200 dark:border-slate-800">
+        <div class="absolute inset-0 z-0 opacity-10 dark:opacity-5 pointer-events-none" style="background-image: radial-gradient(#0d9488 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <div class="z-10 max-w-3xl mt-8">
+          <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400" data-i18n="hero_title">
+            緯創資通 (Wistron)
+          </h1>
+          <p class="text-xl md:text-2xl text-slate-600 dark:text-slate-300 mb-8 font-medium border-b-2 border-accent inline-block pb-2" data-i18n="hero_sub">
+            緯創 TP0 檔案重點摘要
+          </p>
+          <p class="text-md text-slate-500 dark:text-slate-400 mb-10 leading-relaxed max-w-2xl mx-auto" data-i18n="hero_desc">
+            本網頁為 1142 國際策略管理期末專案，透過互動式介面深入解析緯創資通的企業策略、市場定位與未來展望。
+          </p>
+          <a href="#" onclick="navigateTo('intro'); return false;" class="inline-flex items-center gap-2 px-8 py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-full font-bold transition-transform transform hover:scale-105 shadow-lg shadow-brand-500/30">
+            <span data-i18n="hero_btn">開始探索</span> <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </header>
+
+      <!-- 動機與介紹 -->
+      <section id="intro" class="page-section hidden py-20 bg-white dark:bg-slate-800">
+        <div class="max-w-6xl mx-auto px-6 lg:px-10">
+          <h2 class="text-3xl font-bold mb-8 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+            <i class="fa-solid fa-lightbulb text-brand-600 dark:text-brand-400"></i> <span data-i18n="intro_title">動機與介紹</span>
+          </h2>
+          
+          <div class="bg-brand-50 dark:bg-slate-700/50 p-8 rounded-3xl border border-brand-100 dark:border-slate-600 shadow-sm">
+            <h3 class="text-xl font-bold mb-4 text-slate-800 dark:text-white" data-i18n="intro_audio_title">🎙️ 語音介紹</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mb-4" data-i18n="intro_audio_hint">點擊下方播放按鈕聆聽本專案的語音介紹：</p>
+            
+            <!-- 請將 src 替換為您的音檔網址 -->
+            <audio controls class="w-full mb-8 rounded-xl shadow-sm bg-white dark:bg-slate-800">
+              <source src="YOUR_AUDIO_LINK_HERE.mp3" type="audio/mpeg">
+              您的瀏覽器不支援音訊播放元素。
+            </audio>
+
+            <h3 class="text-xl font-bold mb-4 text-slate-800 dark:text-white mt-4" data-i18n="intro_overview_title">專案總覽 (Overview)</h3>
+            <p class="leading-relaxed text-slate-700 dark:text-slate-300 text-lg border-l-4 border-brand-500 pl-4" data-i18n="intro_overview_desc">
+              詳細記錄緯創從傳統筆記型電腦代工廠，成功轉型為 AI 運算基礎建設核心供應商的歷程、財務表現、全球布局及永續經營發展。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 團隊成員與反思 -->
+      <section id="team" class="page-section hidden py-20 bg-slate-100 dark:bg-slate-900 border-y border-gray-200 dark:border-slate-800">
+        <div class="max-w-6xl mx-auto px-6 lg:px-10">
+          <h2 class="text-3xl font-bold mb-12 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+            <i class="fa-solid fa-users text-brand-600 dark:text-brand-400"></i> <span data-i18n="team_title">小組成員與協作反思</span>
+          </h2>
+          
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl mb-12 border-l-4 border-accent shadow-sm">
+            <h3 class="text-xl font-bold mb-3 text-brand-900 dark:text-white" data-i18n="team_ref_title">團隊協作歷程反思</h3>
+            <p class="leading-relaxed text-slate-700 dark:text-slate-300" data-i18n="team_ref_desc">我們並非以傳統「切分工作」的方式進行。全組成員共同參與了前期個案探討與心智圖發想（參考TP0）。在網頁製作階段，我們利用 Notion 協同編輯內容，並在開發過程中採用結對編程 (Pair Programming) 的概念，確保 UI/UX 設計與策略分析內容的邏輯一致性。</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Members (簡化為兩張卡片示範，保持版面簡潔) -->
+            <div class="flip-card relative w-full h-64 perspective-1000 cursor-pointer">
+              <div class="flip-card-inner w-full h-full duration-500 preserve-3d relative">
+                <div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm flex flex-col items-center justify-center p-6 border-2 border-transparent hover:border-brand-400 transition-colors">
+                  <h3 class="text-2xl font-bold text-slate-800 dark:text-white" data-i18n="m1_name">王小明</h3>
+                  <p class="mt-4 text-sm text-brand-600 dark:text-brand-400" data-i18n="click_to_flip">點擊翻轉</p>
+                </div>
+                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-brand-600 dark:bg-brand-900 rounded-2xl shadow-lg flex flex-col items-center justify-center p-6 text-white border border-brand-500">
+                  <h3 class="text-xl font-bold mb-3 text-accent" data-i18n="m1_role">專案經理</h3>
+                  <p class="text-sm text-center" data-i18n="m1_detail">負責統籌進度與市場環境分析。</p>
+                </div>
+              </div>
+            </div>
+            <div class="flip-card relative w-full h-64 perspective-1000 cursor-pointer">
+              <div class="flip-card-inner w-full h-full duration-500 preserve-3d relative">
+                <div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm flex flex-col items-center justify-center p-6 border-2 border-transparent hover:border-brand-400 transition-colors">
+                  <h3 class="text-2xl font-bold text-slate-800 dark:text-white" data-i18n="m2_name">李大華</h3>
+                  <p class="mt-4 text-sm text-brand-600 dark:text-brand-400" data-i18n="click_to_flip">點擊翻轉</p>
+                </div>
+                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-brand-600 dark:bg-brand-900 rounded-2xl shadow-lg flex flex-col items-center justify-center p-6 text-white border border-brand-500">
+                  <h3 class="text-xl font-bold mb-3 text-accent" data-i18n="m2_role">UI/UX 開發</h3>
+                  <p class="text-sm text-center" data-i18n="m2_detail">主導網頁設計與雙語功能開發。</p>
+                </div>
+              </div>
+            </div>
+            <div class="flip-card relative w-full h-64 perspective-1000 cursor-pointer">
+              <div class="flip-card-inner w-full h-full duration-500 preserve-3d relative">
+                <div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm flex flex-col items-center justify-center p-6 border-2 border-transparent hover:border-brand-400 transition-colors">
+                  <h3 class="text-2xl font-bold text-slate-800 dark:text-white" data-i18n="m3_name">陳美玲</h3>
+                  <p class="mt-4 text-sm text-brand-600 dark:text-brand-400" data-i18n="click_to_flip">點擊翻轉</p>
+                </div>
+                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-brand-600 dark:bg-brand-900 rounded-2xl shadow-lg flex flex-col items-center justify-center p-6 text-white border border-brand-500">
+                  <h3 class="text-xl font-bold mb-3 text-accent" data-i18n="m3_role">資料蒐集</h3>
+                  <p class="text-sm text-center" data-i18n="m3_detail">彙整緯創歷年財報與資源評價。</p>
+                </div>
+              </div>
+            </div>
+            <div class="flip-card relative w-full h-64 perspective-1000 cursor-pointer">
+              <div class="flip-card-inner w-full h-full duration-500 preserve-3d relative">
+                <div class="absolute w-full h-full backface-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm flex flex-col items-center justify-center p-6 border-2 border-transparent hover:border-brand-400 transition-colors">
+                  <h3 class="text-2xl font-bold text-slate-800 dark:text-white" data-i18n="m4_name">林志豪</h3>
+                  <p class="mt-4 text-sm text-brand-600 dark:text-brand-400" data-i18n="click_to_flip">點擊翻轉</p>
+                </div>
+                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-brand-600 dark:bg-brand-900 rounded-2xl shadow-lg flex flex-col items-center justify-center p-6 text-white border border-brand-500">
+                  <h3 class="text-xl font-bold mb-3 text-accent" data-i18n="m4_role">QA 與互動</h3>
+                  <p class="text-sm text-center" data-i18n="m4_detail">設計互動問答邏輯與全站測試。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chapter 1: 企業轉型核心策略 -->
+      <section id="ch1" class="page-section hidden py-20 bg-white dark:bg-slate-800">
+        <div class="max-w-6xl mx-auto px-6 lg:px-10">
+          <h2 class="text-3xl font-bold mb-12 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+            <i class="fa-solid fa-chess-knight text-brand-600 dark:text-brand-400"></i> <span data-i18n="ch1_title">1. 企業轉型核心策略</span>
+          </h2>
+          
+          <div class="grid md:grid-cols-2 gap-8">
+            <!-- 1.1 -->
+            <div class="flip-card relative w-full h-64 perspective-1000 cursor-pointer">
+              <div class="flip-card-inner w-full h-full duration-500 preserve-3d relative">
+                <div class="absolute w-full h-full backface-hidden bg-slate-50 dark:bg-slate-700 rounded-2xl shadow-md flex flex-col items-center justify-center p-6 border border-gray-200 dark:border-slate-600 hover:border-brand-400 transition-colors">
+                  <i class="fa-solid fa-map-location-dot text-4xl text-accent mb-4"></i>
+                  <h3 class="text-2xl font-bold text-slate-800 dark:text-white" data-i18n="ch1_1_title">1.1 轉型定位</h3>
+                  <p class="mt-2 text-sm text-brand-600 dark:text-brand-400" data-i18n="click_to_flip">點擊翻轉</p>
+                </div>
+                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-brand-600 dark:bg-brand-900 rounded-2xl shadow-lg flex flex-col justify-center p-8 text-white border border-brand-500">
+                  <p class="text-lg leading-relaxed" data-i18n="ch1_1_desc">從傳統 ODM 到雲端、AI、通訊及智慧交通的全面解決方案提供者。</p>
+                </div>
+              </div>
+            </div>
+            <!-- 1.2 -->
+            <div class="flip-card relative w-full h-64 perspective-1000 cursor-pointer">
+              <div class="flip-card-inner w-full h-full duration-500 preserve-3d relative">
+                <div class="absolute w-full h-full backface-hidden bg-slate-50 dark:bg-slate-700 rounded-2xl shadow-md flex flex-col items-center justify-center p-6 border border-gray-200 dark:border-slate-600 hover:border-brand-400 transition-colors">
+                  <i class="fa-solid fa-minus text-4xl text-accent mb-4"></i>
+                  <h3 class="text-2xl font-bold text-slate-800 dark:text-white" data-i18n="ch1_2_title">1.2 減法哲學</h3>
+                  <p class="mt-2 text-sm text-brand-600 dark:text-brand-400" data-i18n="click_to_flip">點擊翻轉</p>
+                </div>
+                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-brand-600 dark:bg-brand-900 rounded-2xl shadow-lg flex flex-col justify-center p-8 text-white border border-brand-500">
+                  <p class="text-lg leading-relaxed" data-i18n="ch1_2_desc">果斷放棄低獲利業務，轉向高單價、高技術門檻的產品，如 AI 伺服器、車用電子及醫療科技。</p>
+                </div>
+              </div>
+            </div>
+            <!-- 1.3 -->
+            <div class="flip-card relative w-full h-64 perspective-1000 cursor-pointer">
+              <div class="flip-card-inner w-full h-full duration-500 preserve-3d relative">
+                <div class="absolute w-full h-full backface-hidden bg-slate-50 dark:bg-slate-700 rounded-2xl shadow-md flex flex-col items-center justify-center p-6 border border-gray-200 dark:border-slate-600 hover:border-brand-400 transition-colors">
+                  <i class="fa-solid fa-server text-4xl text-accent mb-4"></i>
+                  <h3 class="text-2xl font-bold text-slate-800 dark:text-white" data-i18n="ch1_3_title">1.3 AI 系統整合商</h3>
+                  <p class="mt-2 text-sm text-brand-600 dark:text-brand-400" data-i18n="click_to_flip">點擊翻轉</p>
+                </div>
+                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-brand-600 dark:bg-brand-900 rounded-2xl shadow-lg flex flex-col justify-center p-8 text-white border border-brand-500">
+                  <p class="text-lg leading-relaxed" data-i18n="ch1_3_desc">提供從伺服器主機板（L6）到整機櫃系統整合與測試（L10）的全方位能力。</p>
+                </div>
+              </div>
+            </div>
+            <!-- 1.4 -->
+            <div class="flip-card relative w-full h-64 perspective-1000 cursor-pointer">
+              <div class="flip-card-inner w-full h-full duration-500 preserve-3d relative">
+                <div class="absolute w-full h-full backface-hidden bg-slate-50 dark:bg-slate-700 rounded-2xl shadow-md flex flex-col items-center justify-center p-6 border border-gray-200 dark:border-slate-600 hover:border-brand-400 transition-colors">
+                  <i class="fa-solid fa-microchip text-4xl text-accent mb-4"></i>
+                  <h3 class="text-2xl font-bold text-slate-800 dark:text-white" data-i18n="ch1_4_title">1.4 技術領導</h3>
+                  <p class="mt-2 text-sm text-brand-600 dark:text-brand-400" data-i18n="click_to_flip">點擊翻轉</p>
+                </div>
+                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-brand-600 dark:bg-brand-900 rounded-2xl shadow-lg flex flex-col justify-center p-8 text-white border border-brand-500">
+                  <p class="text-lg leading-relaxed" data-i18n="ch1_4_desc">成功切入 NVIDIA（輝達）與 AMD（超微）的供應鏈，供應新一代平台的 GPU 模組與基板。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chapter 2: 卓越的財務與經營績效 -->
+      <section id="ch2" class="page-section hidden py-20 bg-slate-100 dark:bg-slate-900 border-y border-gray-200 dark:border-slate-800">
+        <div class="max-w-6xl mx-auto px-6 lg:px-10">
+          <h2 class="text-3xl font-bold mb-12 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+            <i class="fa-solid fa-chart-line text-brand-600 dark:text-brand-400"></i> <span data-i18n="ch2_title">2. 卓越的財務與經營績效</span>
+          </h2>
+          
+          <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 hover:-translate-y-2 transition-transform duration-300">
+              <div class="w-14 h-14 bg-brand-100 dark:bg-brand-900/50 rounded-2xl flex items-center justify-center text-brand-600 dark:text-brand-400 mb-6">
+                <i class="fa-solid fa-sack-dollar text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-4 text-slate-800 dark:text-white" data-i18n="ch2_1_title">2.1 營收與獲利表現</h3>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="ch2_1_desc">2025 年營收達 2.19 兆元（年增 1.08 倍），稅後純益達 274.01 億元。</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 hover:-translate-y-2 transition-transform duration-300">
+              <div class="w-14 h-14 bg-brand-100 dark:bg-brand-900/50 rounded-2xl flex items-center justify-center text-brand-600 dark:text-brand-400 mb-6">
+                <i class="fa-solid fa-arrow-trend-up text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-4 text-slate-800 dark:text-white" data-i18n="ch2_2_title">2.2 每股盈餘 (EPS)</h3>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="ch2_2_desc">2025 年 EPS 達 9.04 元，法人預期 2026 年有望挑戰 13.52 元。</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 hover:-translate-y-2 transition-transform duration-300">
+              <div class="w-14 h-14 bg-brand-100 dark:bg-brand-900/50 rounded-2xl flex items-center justify-center text-brand-600 dark:text-brand-400 mb-6">
+                <i class="fa-solid fa-chart-pie text-2xl"></i>
+              </div>
+              <h3 class="text-xl font-bold mb-4 text-slate-800 dark:text-white" data-i18n="ch2_3_title">2.3 營收結構變化</h3>
+              <p class="text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="ch2_3_desc">預計 2025 年第三季，伺服器相關營收佔比將突破 70%，展現換血式轉型成效。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chapter 3: 全球產能布局與投資 -->
+      <section id="ch3" class="page-section hidden py-20 bg-white dark:bg-slate-800">
+        <div class="max-w-6xl mx-auto px-6 lg:px-10">
+          <h2 class="text-3xl font-bold mb-12 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+            <i class="fa-solid fa-earth-americas text-brand-600 dark:text-brand-400"></i> <span data-i18n="ch3_title">3. 全球產能布局與投資</span>
+          </h2>
+          
+          <div class="space-y-6">
+            <div class="flex flex-col md:flex-row items-center gap-6 bg-slate-50 dark:bg-slate-700/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-600 hover:border-brand-300 transition">
+              <div class="w-16 h-16 shrink-0 bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-chess-board"></i></div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2" data-i18n="ch3_1_title">3.1 整體策略</h3>
+                <p class="text-slate-600 dark:text-slate-400" data-i18n="ch3_1_desc">採取「滾動式調整」全球配置及「近岸外包」策略，因應地緣政治風險及北美客戶需求。</p>
+              </div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-6 bg-slate-50 dark:bg-slate-700/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-600 hover:border-brand-300 transition">
+              <div class="w-16 h-16 shrink-0 bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-location-dot"></i></div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2" data-i18n="ch3_2_title">3.2 台灣廠區</h3>
+                <p class="text-slate-600 dark:text-slate-400" data-i18n="ch3_2_desc">斥資逾 140 億元建置新竹與竹北廠區，專注高技術門檻的 GPU 伺服器。</p>
+              </div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-6 bg-slate-50 dark:bg-slate-700/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-600 hover:border-brand-300 transition">
+              <div class="w-16 h-16 shrink-0 bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-flag-usa"></i></div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2" data-i18n="ch3_3_title">3.3 美洲廠區</h3>
+                <p class="text-slate-600 dark:text-slate-400" data-i18n="ch3_3_desc">強化墨西哥與美國德州廠區；德州新廠預計 2026 年 Q1 量產，就近交付北美 CSP 訂單。</p>
+              </div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-6 bg-slate-50 dark:bg-slate-700/50 p-6 rounded-2xl border border-gray-100 dark:border-slate-600 hover:border-brand-300 transition">
+              <div class="w-16 h-16 shrink-0 bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-globe"></i></div>
+              <div>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2" data-i18n="ch3_4_title">3.4 其他地區</h3>
+                <p class="text-slate-600 dark:text-slate-400" data-i18n="ch3_4_desc">持續優化越南廠資源並布局印度廠，落實「中國+1」策略。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chapter 4 & 5: 永續與展望 -->
+      <section id="ch4_5" class="page-section hidden py-20 bg-slate-100 dark:bg-slate-900 border-y border-gray-200 dark:border-slate-800">
+        <div class="max-w-6xl mx-auto px-6 lg:px-10">
+          
+          <!-- Ch 4 -->
+          <h2 class="text-3xl font-bold mb-8 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+            <i class="fa-solid fa-leaf text-brand-600 dark:text-brand-400"></i> <span data-i18n="ch4_title">4. 數位轉型與 ESG 永續發展</span>
+          </h2>
+          <div class="grid md:grid-cols-3 gap-6 mb-20">
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+              <h3 class="text-lg font-bold mb-3 text-brand-600 dark:text-brand-400" data-i18n="ch4_1_title">4.1 環境目標</h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="ch4_1_desc">承諾於 2050 年前達成淨零排放（Net Zero），並在 2030 年達成碳中和。</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+              <h3 class="text-lg font-bold mb-3 text-brand-600 dark:text-brand-400" data-i18n="ch4_2_title">4.2 國際肯定</h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="ch4_2_desc">入選 S&P Global 永續年鑑（2026），並在 CDP 氣候變遷與水安全評選中蟬聯最高級 A List。</p>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+              <h3 class="text-lg font-bold mb-3 text-brand-600 dark:text-brand-400" data-i18n="ch4_3_title">4.3 數位轉型</h3>
+              <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="ch4_3_desc">推動智慧製造，包含「R360 研發設計全智動數位轉型」及「AVATAR 智慧供應鏈平台」。</p>
+            </div>
+          </div>
+
+          <!-- Ch 5 -->
+          <h2 class="text-3xl font-bold mb-8 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+            <i class="fa-solid fa-rocket text-brand-600 dark:text-brand-400"></i> <span data-i18n="ch5_title">5. 未來展望與挑戰</span>
+          </h2>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-brand-50 dark:bg-slate-800 p-8 rounded-3xl border border-brand-200 dark:border-slate-700">
+              <div class="flex items-center gap-4 mb-4">
+                <i class="fa-solid fa-arrow-up-right-dots text-3xl text-accent"></i>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white" data-i18n="ch5_1_title">5.1 成長動能</h3>
+              </div>
+              <p class="text-slate-700 dark:text-slate-300 leading-relaxed" data-i18n="ch5_1_desc">AI 相關產品預計有三位數成長，網通產品 2026 年預估有 10 倍的爆發性成長空間。</p>
+            </div>
+            <div class="bg-brand-50 dark:bg-slate-800 p-8 rounded-3xl border border-brand-200 dark:border-slate-700">
+              <div class="flex items-center gap-4 mb-4">
+                <i class="fa-solid fa-shield-halved text-3xl text-accent"></i>
+                <h3 class="text-xl font-bold text-slate-800 dark:text-white" data-i18n="ch5_2_title">5.2 財務風險管理</h3>
+              </div>
+              <p class="text-slate-700 dark:text-slate-300 leading-relaxed" data-i18n="ch5_2_desc">因應毛利率波動及大規模「背貨」現金流壓力，正透過調整產品結構與長期訂單管理來應對。</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 互動問答 -->
+      <section id="quiz" class="page-section hidden py-20 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
+        <div class="max-w-3xl mx-auto px-6 lg:px-10">
+          <div class="bg-slate-50 dark:bg-slate-900 p-8 md:p-12 rounded-3xl shadow-md border border-gray-100 dark:border-slate-700">
+            <h2 class="text-3xl font-bold text-center mb-8 flex items-center justify-center gap-3 text-brand-900 dark:text-brand-300">
+              <i class="fa-solid fa-gamepad text-brand-600 dark:text-brand-400"></i> <span data-i18n="q_title">互動問答 (小測驗)</span>
+            </h2>
+            <div id="quiz-container"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI 運用聲明 -->
+      <section id="ai" class="page-section hidden py-20 bg-slate-100 dark:bg-slate-900">
+        <div class="max-w-4xl mx-auto px-6 lg:px-10">
+          <div class="bg-gradient-to-br from-brand-50 to-slate-100 dark:from-slate-700 dark:to-slate-800 p-8 rounded-3xl border border-brand-100 dark:border-slate-600 shadow-sm">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+              <i class="fa-solid fa-robot text-brand-600 dark:text-brand-400"></i> <span data-i18n="ai_title">AI 工具運用聲明</span>
+            </h2>
+            <p class="mb-4 text-slate-700 dark:text-slate-300" data-i18n="ai_desc">本專案在製作過程中，合理使用 AI 輔助以提升效率：</p>
+            <ul class="list-disc pl-6 space-y-2 text-slate-600 dark:text-slate-400">
+              <li data-i18n="ai_t1">資料彙整：使用 ChatGPT 協助萃取緯創近期財報與 TP0 重點摘要。</li>
+              <li data-i18n="ai_t2">網頁程式：使用 AI 協助建立 Vanilla JS 元件架構與 Tailwind RWD 切版。</li>
+              <li data-i18n="ai_t3">多國語系：使用 AI 進行英文文案的初步潤飾，並由組員進行最終審校。</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 引用資料區塊 -->
+      <section id="references" class="page-section hidden py-20 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700">
+        <div class="max-w-4xl mx-auto px-6 lg:px-10">
+          <div class="bg-slate-50 dark:bg-slate-900 p-8 rounded-3xl shadow-md border border-gray-200 dark:border-slate-700 border-l-8 border-l-brand-500">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3 text-brand-900 dark:text-brand-300">
+              <i class="fa-solid fa-link text-brand-600 dark:text-brand-400"></i> <span data-i18n="ref_title">引用資料</span>
+            </h2>
+            <p class="mb-6 text-slate-700 dark:text-slate-300" data-i18n="ref_desc">本專案網頁介面配色與排版靈感，部分參考自 114 級網頁競賽優勝作品：</p>
+            
+            <a href="https://jeremywang0121.github.io/CDPS_First-Place-in-114_webpage-competition/" target="_blank" rel="noopener noreferrer" class="group flex items-center gap-3 p-4 rounded-xl bg-white hover:bg-brand-50 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600 transition-colors break-all">
+              <div class="bg-brand-100 dark:bg-brand-900/50 p-3 rounded-lg text-brand-600 dark:text-brand-400 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </div>
+              <span class="text-brand-700 dark:text-brand-300 font-medium">https://jeremywang0121.github.io/CDPS_First-Place-in-114_webpage-competition/</span>
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 py-12 text-center text-slate-400 mt-auto">
+      <div class="max-w-6xl mx-auto px-6">
+        <h3 class="text-xl font-bold text-white mb-4" data-i18n="f_course">1142 國際策略管理</h3>
+        <div class="flex flex-col sm:flex-row justify-center gap-4 text-sm mb-8">
+          <span data-i18n="f_prof">授課教師：梅筱珍</span>
+          <span class="hidden sm:inline text-slate-600">|</span>
+          <span data-i18n="f_ta">助教：戴子然、王毓翰</span>
+        </div>
+        <p class="text-xs text-slate-500">&copy; <span id="currentYear"></span> 國際策略管理 G1 Merida. All rights reserved.</p>
+      </div>
+    </footer>
+  </main>
+
+  <!-- 應用程式邏輯 (Vanilla JS) -->
+  <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // 多國語系字典 (包含全新章節翻譯)
+    const content = {
+      zh: {
+        nav_intro: '動機與介紹', nav_team: '團隊介紹', 
+        nav_ch1: '轉型策略', nav_ch2: '財務與績效', nav_ch3: '全球佈局', nav_ch4_5: '永續與展望',
+        nav_quiz: '互動測驗', nav_ai: 'AI 運用', nav_ref: '引用資料',
+        hero_title: '緯創資通 (Wistron)', hero_sub: '緯創 TP0 檔案重點摘要',
+        hero_desc: '本網頁為 1142 國際策略管理期末專案，透過互動式介面深入解析緯創資通的企業策略、市場定位與未來展望。',
+        hero_btn: '開始探索',
+        intro_title: '動機與介紹', intro_audio_title: '🎙️ 語音介紹', intro_audio_hint: '點擊下方播放按鈕聆聽本專案的語音介紹：',
+        intro_overview_title: '專案總覽 (Overview)', 
+        intro_overview_desc: '詳細記錄緯創從傳統筆記型電腦代工廠，成功轉型為 AI 運算基礎建設核心供應商的歷程、財務表現、全球布局及永續經營發展。',
+        team_title: '小組成員與協作反思', team_ref_title: '團隊協作歷程反思',
+        team_ref_desc: '我們並非以傳統「切分工作」的方式進行。全組成員共同參與了前期個案探討與心智圖發想（參考TP0）。在網頁製作階段，我們利用 Notion 協同編輯內容，並在開發過程中採用結對編程 (Pair Programming) 的概念，確保 UI/UX 設計與策略分析內容的邏輯一致性。',
+        click_to_flip: '點擊翻轉',
+        m1_name: '王小明', m1_role: '專案經理', m1_detail: '負責統籌進度與市場環境分析。',
+        m2_name: '李大華', m2_role: 'UI/UX 開發', m2_detail: '主導網頁設計與雙語功能開發。',
+        m3_name: '陳美玲', m3_role: '資料蒐集', m3_detail: '彙整緯創歷年財報與資源評價。',
+        m4_name: '林志豪', m4_role: 'QA 與互動', m4_detail: '設計互動問答邏輯與全站測試。',
+        ch1_title: '1. 企業轉型核心策略',
+        ch1_1_title: '1.1 轉型定位', ch1_1_desc: '從傳統 ODM 到雲端、AI、通訊及智慧交通的全面解決方案提供者。',
+        ch1_2_title: '1.2 減法哲學', ch1_2_desc: '果斷放棄低獲利業務，轉向高單價、高技術門檻的產品，如 AI 伺服器、車用電子及醫療科技。',
+        ch1_3_title: '1.3 AI 系統整合商', ch1_3_desc: '提供從伺服器主機板（L6）到整機櫃系統整合與測試（L10）的全方位能力。',
+        ch1_4_title: '1.4 技術領導', ch1_4_desc: '成功切入 NVIDIA（輝達）與 AMD（超微）的供應鏈，供應新一代平台的 GPU 模組與基板。',
+        ch2_title: '2. 卓越的財務與經營績效',
+        ch2_1_title: '2.1 營收與獲利表現', ch2_1_desc: '2025 年營收達 2.19 兆元（年增 1.08 倍），稅後純益達 274.01 億元。',
+        ch2_2_title: '2.2 每股盈餘 (EPS)', ch2_2_desc: '2025 年 EPS 達 9.04 元，法人預期 2026 年有望挑戰 13.52 元。',
+        ch2_3_title: '2.3 營收結構變化', ch2_3_desc: '預計 2025 年第三季，伺服器相關營收佔比將突破 70%，展現換血式轉型成效。',
+        ch3_title: '3. 全球產能布局與投資',
+        ch3_1_title: '3.1 整體策略', ch3_1_desc: '採取「滾動式調整」全球配置及「近岸外包」策略，因應地緣政治風險及北美客戶需求。',
+        ch3_2_title: '3.2 台灣廠區', ch3_2_desc: '斥資逾 140 億元建置新竹與竹北廠區，專注高技術門檻的 GPU 伺服器。',
+        ch3_3_title: '3.3 美洲廠區', ch3_3_desc: '強化墨西哥與美國德州廠區；德州新廠預計 2026 年 Q1 量產，就近交付北美 CSP 訂單。',
+        ch3_4_title: '3.4 其他地區', ch3_4_desc: '持續優化越南廠資源並布局印度廠，落實「中國+1」策略。',
+        ch4_title: '4. 數位轉型與 ESG 永續發展',
+        ch4_1_title: '4.1 環境目標', ch4_1_desc: '承諾於 2050 年前達成淨零排放（Net Zero），並在 2030 年達成碳中和。',
+        ch4_2_title: '4.2 國際肯定', ch4_2_desc: '入選 S&P Global 永續年鑑（2026），並在 CDP 氣候變遷與水安全評選中蟬聯最高級 A List。',
+        ch4_3_title: '4.3 數位轉型', ch4_3_desc: '推動智慧製造，包含「R360 研發設計全智動數位轉型」及「AVATAR 智慧供應鏈平台」。',
+        ch5_title: '5. 未來展望與挑戰',
+        ch5_1_title: '5.1 成長動能', ch5_1_desc: 'AI 相關產品預計有三位數成長，網通產品 2026 年預估有 10 倍的爆發性成長空間。',
+        ch5_2_title: '5.2 財務風險管理', ch5_2_desc: '因應毛利率波動及大規模「背貨」現金流壓力，正透過調整產品結構與長期訂單管理來應對。',
+        q_title: '互動問答 (小測驗)',
+        ai_title: 'AI 工具運用聲明', ai_desc: '本專案在製作過程中，合理使用 AI 輔助以提升效率：',
+        ai_t1: '資料彙整：使用 ChatGPT 協助萃取緯創近期財報與 TP0 重點摘要。',
+        ai_t2: '網頁程式：使用 AI 協助建立 Vanilla JS 元件架構與 Tailwind RWD 切版。',
+        ai_t3: '多國語系：使用 AI 進行英文文案的初步潤飾，並由組員進行最終審校。',
+        ref_title: '引用資料', ref_desc: '本專案網頁介面配色與排版靈感，部分參考自 114 級網頁競賽優勝作品：',
+        f_course: '1142 國際策略管理', f_prof: '授課教師：梅筱珍', f_ta: '助教：戴子然、王毓翰'
+      },
+      en: {
+        nav_intro: 'Intro', nav_team: 'Team', 
+        nav_ch1: 'Strategy', nav_ch2: 'Financials', nav_ch3: 'Global Layout', nav_ch4_5: 'ESG & Future',
+        nav_quiz: 'Quiz', nav_ai: 'AI Usage', nav_ref: 'References',
+        hero_title: 'Wistron Corporation', hero_sub: 'Wistron TP0 Key Summary',
+        hero_desc: 'This webpage is the final project for 1142 Strategic Management, exploring Wistron\'s strategy and future outlook.',
+        hero_btn: 'Explore Now',
+        intro_title: 'Motivation & Intro', intro_audio_title: '🎙️ Audio Introduction', intro_audio_hint: 'Click play below to listen to the project intro:',
+        intro_overview_title: 'Overview', 
+        intro_overview_desc: 'Detailed record of Wistron\'s journey from a traditional notebook OEM to a core supplier of AI computing infrastructure, covering financial performance, global layout, and sustainability.',
+        team_title: 'Team & Collaboration', team_ref_title: 'Collaboration Reflection',
+        team_ref_desc: 'We didn\'t just "divide and conquer." We brainstormed via mind maps and used Pair Programming during web development to ensure consistency.',
+        click_to_flip: 'Click to flip',
+        m1_name: 'Xiao-Ming', m1_role: 'Project Manager', m1_detail: 'Coordinated progress & market analysis.',
+        m2_name: 'Da-Hua', m2_role: 'UI/UX Dev', m2_detail: 'Led web design & bilingual features.',
+        m3_name: 'Mei-Ling', m3_role: 'Data', m3_detail: 'Summarized financials & VRIO eval.',
+        m4_name: 'Zhi-Hao', m4_role: 'QA & Interactive', m4_detail: 'Designed quiz logic & testing.',
+        ch1_title: '1. Core Transformation Strategy',
+        ch1_1_title: '1.1 Positioning', ch1_1_desc: 'From traditional ODM to a comprehensive solution provider for cloud, AI, and smart transportation.',
+        ch1_2_title: '1.2 Subtraction Philosophy', ch1_2_desc: 'Abandoning low-profit businesses for high-tech products like AI servers and medical tech.',
+        ch1_3_title: '1.3 AI Integrator', ch1_3_desc: 'Providing capabilities from server motherboards (L6) to rack-level integration (L10).',
+        ch1_4_title: '1.4 Tech Leadership', ch1_4_desc: 'Entered NVIDIA and AMD supply chains, supplying new-gen GPU modules.',
+        ch2_title: '2. Financial Performance',
+        ch2_1_title: '2.1 Revenue & Profit', ch2_1_desc: '2025 revenue hit NT$2.19 trillion (1.08x YoY); net income NT$27.4 billion.',
+        ch2_2_title: '2.2 EPS', ch2_2_desc: '2025 EPS reached NT$9.04, expected to challenge NT$13.52 in 2026.',
+        ch2_3_title: '2.3 Revenue Mix', ch2_3_desc: 'By Q3 2025, server-related revenue expected to top 70%.',
+        ch3_title: '3. Global Capacity Layout',
+        ch3_1_title: '3.1 Strategy', ch3_1_desc: 'Adopted rolling adjustments and near-shoring to mitigate geopolitical risks.',
+        ch3_2_title: '3.2 Taiwan', ch3_2_desc: 'Invested >NT$14 billion in Hsinchu for high-end GPU servers.',
+        ch3_3_title: '3.3 Americas', ch3_3_desc: 'Strengthened Mexico & Texas plants; Texas mass production in Q1 2026.',
+        ch3_4_title: '3.4 Others', ch3_4_desc: 'Optimized Vietnam and India resources for "China+1" strategy.',
+        ch4_title: '4. Digital & ESG Sustainability',
+        ch4_1_title: '4.1 Environment', ch4_1_desc: 'Committed to Net Zero by 2050 and Carbon Neutrality by 2030.',
+        ch4_2_title: '4.2 Recognition', ch4_2_desc: 'Included in S&P Global Sustainability Yearbook (2026) & CDP A List.',
+        ch4_3_title: '4.3 Digitalization', ch4_3_desc: 'Promoting smart manufacturing, including R360 and AVATAR supply chain platform.',
+        ch5_title: '5. Future Outlook',
+        ch5_1_title: '5.1 Growth Drivers', ch5_1_desc: 'AI products to see 3-digit growth; network products foresee 10x growth by 2026.',
+        ch5_2_title: '5.2 Risk Mgmt', ch5_2_desc: 'Managing cash flow pressures via product mix adjustments and long-term orders.',
+        q_title: 'Interactive Quiz',
+        ai_title: 'AI Usage Statement', ai_desc: 'We reasonably used AI tools to enhance efficiency:',
+        ai_t1: 'Data: ChatGPT for financial summaries & TP0 extract.',
+        ai_t2: 'Web Dev: AI for Vanilla JS architecture & Tailwind RWD.',
+        ai_t3: 'Translation: AI for initial English drafts.',
+        ref_title: 'References', ref_desc: 'Color scheme and layout inspiration partly reference the winning project of Class 114:',
+        f_course: '1142 Strategic Mgmt', f_prof: 'Prof: Hsiao-Chen Mei', f_ta: 'TAs: Tzu-Jan Tai, Yu-Han Wang'
+      }
+    };
+
+    let currentLang = 'zh';
+    document.getElementById('langBtn').addEventListener('click', () => {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      document.getElementById('langText').textContent = currentLang === 'zh' ? 'EN' : '中';
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if(content[currentLang][key]) el.innerHTML = content[currentLang][key];
+      });
+      renderQuiz(); 
+    });
+
+    const sidebar = document.getElementById('sidebar');
+    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+    });
+
+    window.navigateTo = function(pageId) {
+      document.querySelectorAll('.page-section').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById(pageId).classList.remove('hidden');
+      if(window.innerWidth < 768) {
+        sidebar.classList.add('-translate-x-full');
+      }
+      window.scrollTo(0, 0);
+    };
+
+    let isDark = false;
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      isDark = !isDark;
+      document.documentElement.classList.toggle('dark', isDark);
+      document.getElementById('themeIcon').className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    });
+
+    document.querySelectorAll('.flip-card').forEach(card => {
+      card.addEventListener('click', () => {
+        card.querySelector('.flip-card-inner').classList.toggle('rotate-y-180');
+      });
+    });
+
+    // 互動問答邏輯 (配合新內容更新題目)
+    const quizQuestions = {
+      zh: [
+        { q: '緯創預計在 2025 年第三季，伺服器相關營收佔比將突破多少？', options: ['30%', '50%', '70%'], ans: 2 },
+        { q: '緯創承諾在哪一年達成淨零排放（Net Zero）？', options: ['2030 年', '2040 年', '2050 年'], ans: 2 },
+        { q: '緯創轉型策略中的「減法哲學」是指什麼？', options: ['減少員工數量', '放棄低獲利業務，轉向高技術門檻產品', '減少海外投資'], ans: 1 }
+      ],
+      en: [
+        { q: 'What percentage is Wistron\'s server-related revenue expected to exceed by Q3 2025?', options: ['30%', '50%', '70%'], ans: 2 },
+        { q: 'By what year has Wistron committed to achieving Net Zero emissions?', options: ['2030', '2040', '2050'], ans: 2 },
+        { q: 'What does Wistron\'s "Subtraction Philosophy" refer to?', options: ['Reducing headcount', 'Abandoning low-profit business for high-tech products', 'Reducing overseas investment'], ans: 1 }
+      ]
+    };
+
+    let currentQ = 0, score = 0, showResult = false;
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      const qText = currentLang === 'zh' ? '問題' : 'Question';
+      
+      if (showResult) {
+        const resultTxt = currentLang === 'zh' ? '測驗結果' : 'Score';
+        const retryTxt = currentLang === 'zh' ? '再試一次' : 'Retry';
+        container.innerHTML = `
+          <div class="text-center animate-fade-in">
+            <h3 class="text-3xl font-bold mb-6 text-brand-700 dark:text-brand-300">${resultTxt}: ${score} / ${quizQuestions[currentLang].length}</h3>
+            <button onclick="resetQuiz()" class="px-8 py-3 bg-brand-600 text-white rounded-full hover:bg-brand-700 transition shadow-lg font-bold">
+              <i class="fa-solid fa-rotate-right mr-2"></i> ${retryTxt}
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      const qData = quizQuestions[currentLang][currentQ];
+      let optionsHtml = '';
+      qData.options.forEach((opt, i) => {
+        optionsHtml += `<button onclick="handleAnswer(${i})" class="quiz-btn w-full text-left px-6 py-4 rounded-xl border-2 border-gray-100 dark:border-slate-600 hover:bg-brand-50 dark:hover:bg-slate-700 hover:border-brand-400 transition-all font-medium text-slate-700 dark:text-slate-200">${opt}</button>`;
+      });
+
+      container.innerHTML = `
+        <div class="animate-fade-in">
+          <p class="text-sm text-brand-600 dark:text-brand-400 font-bold mb-3">${qText} ${currentQ + 1} / ${quizQuestions[currentLang].length}</p>
+          <h3 class="text-xl md:text-2xl font-semibold mb-6 text-slate-800 dark:text-white">${qData.q}</h3>
+          <div class="space-y-4">${optionsHtml}</div>
+          <div id="quiz-feedback" class="mt-6 p-4 rounded-xl text-center font-bold hidden"></div>
+        </div>
+      `;
+    }
+
+    window.handleAnswer = function(idx) {
+      const feedback = document.getElementById('quiz-feedback');
+      document.querySelectorAll('.quiz-btn').forEach(b => b.disabled = true);
+      
+      if (idx === quizQuestions[currentLang][currentQ].ans) {
+        score++;
+        feedback.textContent = currentLang === 'zh' ? '答對了！' : 'Correct!';
+        feedback.className = 'mt-6 p-4 rounded-xl text-center font-bold bg-green-100 text-green-700 border border-green-200 block';
+      } else {
+        feedback.textContent = currentLang === 'zh' ? '答錯了，請再試一次！' : 'Wrong!';
+        feedback.className = 'mt-6 p-4 rounded-xl text-center font-bold bg-red-100 text-red-700 border border-red-200 block';
+      }
+
+      setTimeout(() => {
+        if (currentQ < quizQuestions[currentLang].length - 1) currentQ++;
+        else showResult = true;
+        renderQuiz();
+      }, 1200);
+    }
+
+    window.resetQuiz = function() {
+      currentQ = 0; score = 0; showResult = false;
+      renderQuiz();
+    }
+
+    renderQuiz();
+  </script>
+</body>
+</html>
